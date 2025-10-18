@@ -1,0 +1,31 @@
+@startuml init1
+class Data{
+
+}
+
+class Presentation{
+    + data: Data
+    + display()
+}
+
+together{
+    class Spreadsheet{
+        + display()
+    }
+
+    class BarChart{
+        + display()
+    }
+
+    class PieChart{
+        + display()
+    }
+}
+
+Presentation <|-- Spreadsheet
+Presentation <|-- BarChart
+Presentation <|-- PieChart
+
+Presentation --> Data
+
+@enduml

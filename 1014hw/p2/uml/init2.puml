@@ -1,0 +1,73 @@
+@startuml init2
+class Data{
+    + change()
+}
+
+note bottom of Data
+    void change(){
+        change Data
+        spreadsheet.reflect()
+        barChart.reflect()
+        pieChart.reflect()
+    }
+end note
+
+class Presentation{
+    + data: Data
+    + display()
+    + reflect()
+    + change()
+}
+
+note bottom of Presentation
+    void change(){
+        data.change()
+    }
+
+    void reflect(){
+        get new data
+        display()
+    }
+end note
+
+together{
+    class Spreadsheet{
+        + display()
+        + reflect()
+        + change()
+    }
+
+    class BarChart{
+        + display()
+        + reflect()
+        + change()
+    }
+
+    class PieChart{
+        + display()
+        + reflect()
+        + change()
+    }
+}
+
+class Client{
+    + change()
+}
+
+note top of Client
+void change(){
+    choose one presentation to change(ex barChart.change())
+}
+end note
+
+Presentation <|-- Spreadsheet
+Presentation <|-- BarChart
+Presentation <|-- PieChart
+
+Presentation -- Data
+
+Client --> Spreadsheet
+Client --> BarChart
+Client --> PieChart
+
+@enduml
