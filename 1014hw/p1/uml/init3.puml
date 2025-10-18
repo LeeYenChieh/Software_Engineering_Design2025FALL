@@ -1,0 +1,27 @@
+@startuml init3
+class Composition{
+    + components: Component[]
+    + arrange()
+}
+
+class Component{
+    + natureSize: float
+    + stretchability: float
+    + shrinkability: float
+}
+
+together{
+    class Text{
+
+    }
+
+    class Graphical{
+
+    }
+}
+
+Component <|-- Text
+Component <|-- Graphical
+Composition o-- Component
+
+@enduml

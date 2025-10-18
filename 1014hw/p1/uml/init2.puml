@@ -1,0 +1,25 @@
+@startuml init2
+class Composition{
+    + components: Component[]
+    + arrange()
+}
+
+class Component{
+
+}
+
+together{
+    class Text{
+
+    }
+
+    class Graphical{
+
+    }
+}
+
+Component <|-- Text
+Component <|-- Graphical
+Composition o-- Component
+
+@enduml

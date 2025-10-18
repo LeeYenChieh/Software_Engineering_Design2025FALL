@@ -1,0 +1,52 @@
+@startuml step3
+class Composition{
+    + composeMode: Compose
+    + components: Component[]
+    + arrange()
+    + setCompose(Compose)
+}
+
+interface Compose <<interface>>{
+    + compose()
+} 
+
+together{
+    class SimpleCompose{
+        + compose()
+    }
+
+    class TexCompose{
+        + compose()
+    }
+
+    class ArrayCompose{
+        + compose()
+    }
+}
+
+class Component{
+    + natureSize: float
+    + stretchability: float
+    + shrinkability: float
+}
+
+together{
+    class Text{
+
+    }
+
+    class Graphical{
+
+    }
+}
+
+Component <|-- Text
+Component <|-- Graphical
+Composition o-- Component
+
+Composition --> Compose
+Compose <|.. SimpleCompose
+Compose <|.. TexCompose
+Compose <|.. ArrayCompose
+
+@enduml

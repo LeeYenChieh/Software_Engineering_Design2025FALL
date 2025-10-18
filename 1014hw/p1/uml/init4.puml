@@ -1,0 +1,41 @@
+@startuml init4
+class Composition{
+    + components: Component[]
+    + arrange()
+    + simpleCompose()
+    + texCompose()
+    + arrayCompose()
+}
+
+note left of Composition
+void arrange(){
+    if(type == 'Simple')
+        simpleCompose()
+    else if(type == 'Tex')
+        texCompose()
+    else if(type == 'Array')
+        arrayCompose()
+}
+end note
+
+class Component{
+    + natureSize: float
+    + stretchability: float
+    + shrinkability: float
+}
+
+together{
+    class Text{
+
+    }
+
+    class Graphical{
+
+    }
+}
+
+Component <|-- Text
+Component <|-- Graphical
+Composition o-- Component
+
+@enduml
