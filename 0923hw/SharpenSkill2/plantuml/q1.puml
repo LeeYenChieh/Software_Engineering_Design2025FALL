@@ -1,0 +1,14 @@
+@startuml q1
+left to right direction
+class Person{
+    + writeProject(Language, project): void
+}
+class Language{
+    + writeProject(project): void
+}
+class Project
+
+Person ...> Language : <<use>>
+Person --> Project
+Language --> Project
+@enduml

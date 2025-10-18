@@ -1,0 +1,29 @@
+@startuml step6
+left to right direction
+class Hospital{
+    + physicians: ArrayList<Physician>
+    + records: ArrayList[Record]
+}
+class Physician
+
+Hospital o---> "1..*\n{registerd}" Physician
+
+class Patient{
+    + admitPhysician: Physician
+    + treatPhysician: Physician[]
+}
+Physician "1" --- "0..*" Patient : admit
+Physician -[hidden]- Patient
+Physician -[hidden]- Patient
+Physician "1..*" --- "0..*" Patient : treat
+
+(Physician, Patient) . Record
+class Record{
+    + data
+    + time
+    + result
+}
+Hospital --> Record
+
+
+@enduml

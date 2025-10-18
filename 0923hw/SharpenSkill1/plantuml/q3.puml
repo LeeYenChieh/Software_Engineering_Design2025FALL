@@ -1,0 +1,11 @@
+@startuml q3
+left to right direction
+class File{
+    records: ArrayList<Record>
+}
+
+class Record
+
+File "1" *---> "0..*" Record
+
+@enduml

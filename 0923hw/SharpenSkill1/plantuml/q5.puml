@@ -1,0 +1,10 @@
+@startuml q5
+left to right direction
+class Polygon{
+    + points: Set<Point>
+}
+class Point
+
+Polygon "1" *----> "3..* \n {ordered}" Point
+
+@enduml

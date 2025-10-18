@@ -1,0 +1,12 @@
+@startuml step1
+class OnlineShoppingSite{
+    + type: String
+}
+class Order
+class OrderFulfillingCompany
+' class Company
+
+OnlineShoppingSite ..> Order
+OnlineShoppingSite --> OrderFulfillingCompany
+
+@enduml

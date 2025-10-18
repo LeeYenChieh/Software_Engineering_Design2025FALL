@@ -1,0 +1,40 @@
+@startuml step1
+left to right direction
+class Client{
+    + people: Map<String, Person>
+    + createPerson(name, job, weight, height)
+    + getJob(name)
+    + getWeightAverage(names[])
+    + getWeightSum(names[])
+    + getHeightAverage(names[])
+    + getHeightSum(names[])
+}
+
+class Person{
+    + name: string
+    + job: string
+    + weight: float
+    + height: float
+    + Person(name, job, weight, height)
+}
+
+class NullPerson{
+    + name: string = 'Unknown'
+    + job: string = 'Unknown'
+    + weight: float = 0
+    + height: float = 0
+}
+
+note bottom of Client
+void createPerson(name, job, weight, height){
+    if one of name, job, weight and height is invalid:
+        this.people.add(new NullPerson())
+    else
+        this.people.add(new Person(name, job, weight, height))
+}
+end note
+
+Client o--> Person
+Client o--> NullPerson
+
+@enduml

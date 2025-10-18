@@ -1,0 +1,8 @@
+@startuml q3
+left to right direction
+class Object{
+    + attributes: ArrayList<Attribute>
+}
+class Attribute
+Object "1" *---> "0..*" Attribute
+@enduml

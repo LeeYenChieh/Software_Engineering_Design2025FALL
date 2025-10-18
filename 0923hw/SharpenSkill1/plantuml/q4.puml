@@ -1,0 +1,17 @@
+@startuml q4
+class Drawing
+together {
+    class Text
+    class Geometrical
+    class Group{
+        + objects: ArrayList<Drawing>
+    }
+}
+
+Drawing <|-- Text
+Drawing <|-- Geometrical
+Drawing <|-- Group
+
+Drawing -[hidden]- Group
+Drawing "1..*" <-o Group
+@enduml

@@ -1,0 +1,10 @@
+@startuml q5
+left to right direction
+class City
+class Route{
+    + citys: City[2]
+}
+
+Route "1" *---> "2" City
+
+@enduml

@@ -1,0 +1,38 @@
+@startuml step3
+left to right direction
+
+class SalesReportingApplication{
+    + select(d: Department)
+}
+class Store{
+    + departments: Department[]
+}
+class Department
+
+Store *-- "1..*" Department
+SalesReportingApplication --> Store
+
+class User
+User ..> SalesReportingApplication
+
+class Report{
+    + display()
+}
+together{
+    class MonthlyReport{
+        + transactions: String[]
+        + currentMonth: String
+    }
+    class YDTSalesChart{
+        + ytdSales: String
+        + month: String
+    }
+}
+
+SalesReportingApplication ..> Report : <<Create>>
+Report <|-- MonthlyReport
+Report <|-- YDTSalesChart
+MonthlyReport --> Department
+YDTSalesChart --> Department
+
+@enduml

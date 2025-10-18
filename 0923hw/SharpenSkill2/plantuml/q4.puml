@@ -1,0 +1,19 @@
+@startuml q4
+left to right direction
+class Person{
+    + year: Year
+}
+class Team{
+    + year: Year
+}
+
+Person "1" -- "1" Team
+(Person, Team) . Year
+
+class Year{
+    + person: Person
+    + team: Team
+    + year: int
+}
+
+@enduml

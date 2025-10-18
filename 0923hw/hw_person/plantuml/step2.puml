@@ -1,0 +1,43 @@
+@startuml step2
+left to right direction
+class Person{
+    + name
+    + address
+    + number
+    + companys: Company[]
+}
+
+class Company{
+    + name
+    + address
+    + number
+    + product
+    + people: Person[]
+    + hire(person)
+    + fire(person)
+}
+
+class Project{
+    + name
+    + budget
+    + priority
+}
+
+Person "*" --- "*" Company
+Person -- "0..*" Project
+(Person, Project) . Salary
+
+class Salary
+
+together{
+    class Worker
+    class Manager
+}
+
+Person <|-- Worker
+Person <|--Manager
+
+Worker "1..*" -- Project : work
+Manager "1" -- Project : response
+
+@enduml

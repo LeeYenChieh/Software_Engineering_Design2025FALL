@@ -1,0 +1,18 @@
+@startuml step2
+left to right direction
+
+class SalesReportingApplication{
+    + select(d: Department)
+}
+class Store{
+    + departments: Department[]
+}
+class Department
+
+Store *-- "1..*" Department
+SalesReportingApplication --> Store
+
+class User
+User ..> SalesReportingApplication
+
+@enduml

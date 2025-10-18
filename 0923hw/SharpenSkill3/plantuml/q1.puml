@@ -1,0 +1,23 @@
+@startuml q1
+class Component
+together{
+    class File
+    class Directory{
+        + components: ArrayList<Component>
+    }
+}
+Component <|-- File
+Component <|-- Directory
+Component -[hidden]- Directory
+Component "1..*" <-* Directory
+
+class FileSystem
+together{
+    class Windows
+    class Unix
+}
+FileSystem <|-- Windows
+FileSystem <|-- Unix
+
+Component <-* FileSystem
+@enduml

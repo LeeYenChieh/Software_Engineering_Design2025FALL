@@ -1,0 +1,8 @@
+@startuml q6
+class Student
+class Professor
+class Course
+
+Professor - Course
+Course o--> Student
+@enduml

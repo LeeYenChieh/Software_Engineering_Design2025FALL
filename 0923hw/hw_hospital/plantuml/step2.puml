@@ -1,0 +1,12 @@
+@startuml step2
+left to right direction
+class Hospital{
+    + physicians: ArrayList<Physician>
+}
+class Physician
+
+Hospital o---> "1..*\n{registerd}" Physician
+
+class Patient
+Physician - Patient
+@enduml

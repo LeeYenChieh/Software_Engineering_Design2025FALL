@@ -1,0 +1,10 @@
+@startuml q2
+left to right direction
+class Philosopher{
+    + state : String
+}
+
+class Fork
+
+Philosopher ..> Fork : <<use>>
+@enduml

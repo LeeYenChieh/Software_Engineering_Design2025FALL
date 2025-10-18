@@ -1,0 +1,13 @@
+@startuml q2
+together{
+    class Modem
+    class Keyboard
+}
+class Device{
+    + type: String
+}
+
+Device <|-- Modem
+Device <|-- Keyboard
+
+@enduml
