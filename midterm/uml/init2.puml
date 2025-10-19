@@ -1,0 +1,38 @@
+@startuml init2
+
+class Book{
+
+}
+
+class LibrarySystem{
+    + checkoutBook(Book)
+    + returnBook(Book)
+    + addBook(Book)
+    + removeBook(Book)
+    + getBooksByAuthor(String author)
+    + getBookByArea(String area)
+    + getCheckedoutBookByBorrower(User)
+    + getBorrowerByBook(Book)
+}
+
+LibrarySystem --> Book
+
+class User{
+
+}
+
+together{
+    class Staff{
+
+    }
+
+    class Borrower{
+
+    }
+}
+
+User -- LibrarySystem
+User <|-- Staff
+User <|-- Borrower
+
+@enduml
