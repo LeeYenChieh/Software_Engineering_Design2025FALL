@@ -1,0 +1,62 @@
+@startuml init4
+
+class Duck{
+    + fly()
+    + swim()
+    + quack()
+    + squeak()
+    + silent()
+}
+
+together{
+    class MallardDuck{
+        + swim()
+        + fly()
+    }
+
+    class RedheadDuck{
+        + swim()
+        + fly()
+    }
+
+    class RubberDuck{
+        + swim()
+        + fly()
+    }
+
+    class DecoyDuck{
+        + swim()
+        + fly()
+    }
+}
+
+note bottom of MallardDuck
+    void fly(){
+        can fly!
+    }
+end note
+
+note bottom of RedheadDuck
+    void fly(){
+        can fly!
+    }
+end note
+
+note bottom of RubberDuck
+    void fly(){
+        can fly!
+    }
+end note
+
+note bottom of DecoyDuck
+    void fly(){
+        can fly!
+    }
+end note
+
+Duck <|-- MallardDuck
+Duck <|-- RedheadDuck
+Duck <|-- RubberDuck
+Duck <|-- DecoyDuck
+
+@enduml

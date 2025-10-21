@@ -1,0 +1,47 @@
+@startuml step1
+
+class Book{
+    + availableCheckout
+    + checkoutUser: User
+}
+
+class LibrarySystem{
+    + books: Book[]
+    + checkoutBook(Book)
+    + returnBook(Book)
+    + addBook(Book)
+    + removeBook(Book)
+    + getBooksByAuthor(String author)
+    + getBookByArea(String area)
+    + getCheckedoutBookByBorrower(User)
+    + getBorrowerByBook(Book)
+}
+
+LibrarySystem --> Book
+
+class User{
+
+}
+
+together{
+    class Staff{
+
+    }
+
+    class Borrower{
+        + borrowNum
+    }
+}
+
+User -- LibrarySystem
+User <|-- Staff
+User <|-- Borrower
+
+note bottom of LibrarySystem
+checkoutBook(){
+    if(user is valid)
+        exec checkoutBook
+}
+end note
+
+@enduml

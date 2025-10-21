@@ -1,0 +1,30 @@
+@startuml init2
+
+class Duck{
+    + swim()
+}
+
+together{
+    class MallardDuck{
+        + swim()
+    }
+
+    class RedheadDuck{
+        + swim()
+    }
+
+    class RubberDuck{
+        + swim()
+    }
+
+    class DecoyDuck{
+        + swim()
+    }
+}
+
+Duck <|-- MallardDuck
+Duck <|-- RedheadDuck
+Duck <|-- RubberDuck
+Duck <|-- DecoyDuck
+
+@enduml

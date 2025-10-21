@@ -1,11 +1,12 @@
 @startuml init4
 
 class Book{
-    + copy
     + availableCheckout
+    + checkoutUser: User
 }
 
 class LibrarySystem{
+    + books: Book[]
     + checkoutBook(Book)
     + returnBook(Book)
     + addBook(Book)
@@ -14,7 +15,6 @@ class LibrarySystem{
     + getBookByArea(String area)
     + getCheckedoutBookByBorrower(User)
     + getBorrowerByBook(Book)
-    + handleReq(User)
 }
 
 LibrarySystem --> Book
@@ -38,13 +38,10 @@ User <|-- Staff
 User <|-- Borrower
 
 note bottom of LibrarySystem
-if(req == transaction 1, 2, 4, 5 and user == staff)
-    req()
-else if(req == transaction 4 
-        and user == borrower and borrower is self)
-    req()
-else if(req == transaction 3)
-    req()
+checkoutBook(){
+    if(user is valid)
+        exec checkoutBook
+}
 end note
 
 @enduml
