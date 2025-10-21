@@ -1,4 +1,4 @@
-@startuml step1
+@startuml step3
 
 class Book{
     + author: String
@@ -25,6 +25,16 @@ together{
 User <|-- Staff
 User <|-- Borrower
 
+interface ILibrarySystem{
+    + checkoutBook(Book)
+    + returnBook(Book)
+    + addBook(Book)
+    + removeBook(Book)
+    + getBooksByAuthor(String author)
+    + getBookBySubject(String subject)
+    + getCheckedoutBookByBorrower(Borrower)
+    + getBorrowerByBook(Book)
+}
 
 together{
     class RealLibrarySystem{
@@ -40,6 +50,7 @@ together{
     }
 
     class StaffLibrarySystem{
+        + user: User
         + checkoutBook(Book)
         + returnBook(Book)
         + addBook(Book)
@@ -51,6 +62,7 @@ together{
     }
 
     class BorrowerLibrarySystem{
+        + user: User
         + checkoutBook(Book)
         + returnBook(Book)
         + addBook(Book)
@@ -62,15 +74,19 @@ together{
     }
 }
 
-User -- RealLibrarySystem
+LibrarySystem <|.. RealLibrarySystem
+LibrarySystem <|.. StaffLibrarySystem
+LibrarySystem <|.. BorrowerLibrarySystem
+StaffLibrarySystem --> User
+BorrowerLibrarySystem --> User
 
-note bottom of RealLibrarySystem
+note left of RealLibrarySystem
 void checkoutBook(Book b, Borrower borrower){
     b.borrower = borrower
     b.available = false
 }
 
-void returnBook(Book b){
+void returnBook(User user, Book b){
     b.borrower = null
     b.available = true
 }

@@ -1,4 +1,4 @@
-@startuml step1
+@startuml step2
 
 class Book{
     + author: String
@@ -25,6 +25,16 @@ together{
 User <|-- Staff
 User <|-- Borrower
 
+interface LibrarySystem{
+    + checkoutBook(Book)
+    + returnBook(Book)
+    + addBook(Book)
+    + removeBook(Book)
+    + getBooksByAuthor(String author)
+    + getBookBySubject(String subject)
+    + getCheckedoutBookByBorrower(Borrower)
+    + getBorrowerByBook(Book)
+}
 
 together{
     class RealLibrarySystem{
@@ -62,6 +72,9 @@ together{
     }
 }
 
+LibrarySystem <|.. RealLibrarySystem
+LibrarySystem <|.. StaffLibrarySystem
+LibrarySystem <|.. BorrowerLibrarySystem
 User -- RealLibrarySystem
 
 note bottom of RealLibrarySystem

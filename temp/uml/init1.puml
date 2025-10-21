@@ -1,7 +1,9 @@
 @startuml init1
 
 class Book{
-
+    + String author
+    + String subject
+    + String borrower
 }
 
 class LibrarySystem{
@@ -11,10 +13,59 @@ class LibrarySystem{
     + addBook(Book)
     + removeBook(Book)
     + getBooksByAuthor(String author)
-    + getBookByArea(String area)
+    + getBookBySubject(String subject)
     + getCheckedoutBookByBorrower(String borrower)
     + getBorrowerByBook(Book)
 }
+
+note right of LibrarySystem
+void checkoutBook(Book b){
+    checkout b
+}
+
+void returnBook(Book b){
+    return Book b
+}
+
+void addBook(Book b){
+    this.books.add(b)
+}
+
+void removeBook(Book b){
+    this.books.remove(b)
+}
+
+Book[] getBooksByAuthor(String author){
+    Book[] target
+    for(Book b : this.books){
+        if(b.author.equals(author))
+            target.add(b)
+    }
+    return target
+}
+
+Book[] getBooksBySubject(String subject){
+    Book[] target
+    for(Book b : this.books){
+        if(b.subject.equals(subject))
+            target.add(b)
+    }
+    return target
+}
+
+Book[] getCheckedoutBookByBorrower(String borrower){
+    Book[] target
+    for(Book b : this.books){
+        if(b.borrower.equals(borrower))
+            target.add(b)
+    }
+    return target
+}
+
+String getBorrowerByBook(Book b){
+    return b.borrower
+}
+end note
 
 LibrarySystem --> Book
 
