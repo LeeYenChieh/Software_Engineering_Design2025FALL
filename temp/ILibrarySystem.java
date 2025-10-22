@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public interface ILibraryStstem {
+public interface ILibrarySystem {
     public void checkoutBook(ArrayList<Book> books, Borrower borrower);
 
     public void returnBook(Book book);

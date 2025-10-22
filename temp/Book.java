@@ -9,7 +9,8 @@ public class Book {
         this.author = author;
         this.subject = subject;
         this.borrower = null;
-        this.available = false;
+        this.available = true;
+        this.id = id;
     }
 
     public void checkedout(Borrower borrower){

@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class RealLibrarySystem implements ILibraryStstem{
+public class RealLibrarySystem implements ILibrarySystem{
     public int curId;
     public ArrayList<Book> books;
 
@@ -45,6 +45,7 @@ public class RealLibrarySystem implements ILibraryStstem{
 
     public void addBook(Book book){
         this.books.add(book);
+        this.curId += 1;
     }
 
     public void removeBook(Book book){
@@ -75,5 +76,17 @@ public class RealLibrarySystem implements ILibraryStstem{
 
     public Borrower getBorrowerByBook(Book book){
         return book.borrower;
+    }
+
+    public Book getBookById(int id){
+        for(Book b : this.books){
+            if(b.id == id)
+                return b;
+        }
+        return null;
+    }
+
+    public int getCurId(){
+        return this.curId;
     }
 }
