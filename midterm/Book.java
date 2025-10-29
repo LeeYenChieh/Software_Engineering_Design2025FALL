@@ -1,16 +1,16 @@
 public class Book {
     public String author;
     public String subject;
-    public Borrower borrower;
-    public Boolean available;
     public int id;
+    public Boolean available;
+    public Borrower borrower;
 
     public Book(String author, String subject, int id){
         this.author = author;
         this.subject = subject;
-        this.borrower = null;
-        this.available = true;
         this.id = id;
+        this.available = true;
+        this.borrower = null;
     }
 
     public void checkedout(Borrower borrower){

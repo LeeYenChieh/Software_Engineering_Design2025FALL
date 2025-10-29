@@ -1,14 +1,13 @@
 import java.util.ArrayList;
 
-public class RealLibrarySystem implements ILibrarySystem{
-    public int curId;
+public class RealLibrarySystem implements ILibrarySystem {
     public ArrayList<Book> books;
+    public int curId;
 
     public RealLibrarySystem(){
-        this.curId = 0;
         this.books = new ArrayList<Book>();
+        this.curId = 0;
     }
-
 
     public Boolean checkAllBookIsAvailable(ArrayList<Book> books){
         for(Book b : books){
@@ -18,7 +17,7 @@ public class RealLibrarySystem implements ILibrarySystem{
         return true;
     }
 
-    public void checkoutBook(ArrayList<Book> books, Borrower borrower){
+    public void checkout(ArrayList<Book> books, Borrower borrower){
         if(borrower.canCheckoutBook(books.size())){
             if(this.checkAllBookIsAvailable(books)){
                 for(Book b : books){
@@ -52,41 +51,44 @@ public class RealLibrarySystem implements ILibrarySystem{
         this.books.remove(book);
     }
 
-    public ArrayList<Book> getBooksByAuthor(String author){
-        ArrayList<Book> targets = new ArrayList<Book>();
+    public ArrayList<Book> getBookByAuthor(String author){
+        ArrayList<Book> result = new ArrayList<Book>();
         for(Book b : this.books){
             if(b.author.equals(author))
-                targets.add(b);
+                result.add(b);
         }
-        return targets;
+        return result;
     }
 
-    public ArrayList<Book> getBooksBySubject(String subject){
-        ArrayList<Book> targets = new ArrayList<Book>();
+    public ArrayList<Book> getBookBySubject(String subject){
+        ArrayList<Book> result = new ArrayList<Book>();
         for(Book b : this.books){
             if(b.subject.equals(subject))
-                targets.add(b);
+                result.add(b);
         }
-        return targets;
+        return result;
     }
 
-    public ArrayList<Book> getCheckedoutBookByBorrower(Borrower borrower){
+    public ArrayList<Book> getBookByBorrower(Borrower borrower){
         return borrower.checkoutBook;
     }
 
-    public Borrower getBorrowerByBook(Book book){
+    public Borrower getLastBorrowerByBook(Book book){
+        if(book.borrower == null)
+            System.out.println("Error");
         return book.borrower;
-    }
-
-    public Book getBookById(int id){
-        for(Book b : this.books){
-            if(b.id == id)
-                return b;
-        }
-        return null;
     }
 
     public int getCurId(){
         return this.curId;
+    }
+
+    public Book getBookById(int target){
+        for(Book b : this.books){
+            if(b.id == target)
+                return b;
+        }
+
+        return null;
     }
 }

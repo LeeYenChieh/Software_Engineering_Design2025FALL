@@ -1,18 +1,17 @@
 import java.util.ArrayList;
 
 public class Borrower extends User {
-    public int maxNumCheckoutBook;
+    public int maxNum;
     public ArrayList<Book> checkoutBook;
 
-    public Borrower(String name, int maxNumCheckoutBook){
+    public Borrower(String name, int maxNum){
         super(name);
-        this.role = "Borrower";
-        this.maxNumCheckoutBook= maxNumCheckoutBook;
+        this.maxNum = maxNum;
         this.checkoutBook = new ArrayList<Book>();
     }
 
     public Boolean canCheckoutBook(int num){
-        if(num <= this.maxNumCheckoutBook)
+        if(num <= this.maxNum)
             return true;
         return false;
     }

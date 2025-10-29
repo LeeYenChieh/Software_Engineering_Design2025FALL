@@ -5,9 +5,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class LibrarySystem {
-
     public static void displayError(){
         System.out.println("Error");
+    }
+
+    public static ILibrarySystem getSystem(String name){
+        return userSystem.get(name);
+    }
+
+    public static User getUser(String name){
+        return users.get(name);
+    }
+
+    public static void printBooks(ArrayList<Book> books){
+        for(Book b : books){
+            System.out.printf("ID: %d Author: %s Subject: %s\n", b.id, b.author, b.subject);
+        }
     }
 
     public static String readNextLine(BufferedReader reader){
@@ -17,11 +30,12 @@ public class LibrarySystem {
                 nextLine = reader.readLine();
                 if(nextLine == null)
                     break;
-                String[] parts = nextLine.trim().split("\\s+");
+                String[] parts = parseStrings(nextLine);
                 if(parts.length == 0 || parts[0].equals(""))
                     continue;
                 break;
             } catch (Exception e){
+                displayError();
                 continue;
             }
         }
@@ -61,6 +75,8 @@ public class LibrarySystem {
     public static Book readBook(BufferedReader reader, int id){
         try{
             String line = readNextLine(reader);
+            if(line == null)
+                throw new Exception();
             String[] parts = parseStrings(line);
             if(parts.length != 2)
                 throw new Exception();
@@ -74,13 +90,15 @@ public class LibrarySystem {
     public static User readUser(BufferedReader reader){
         try{
             String line = readNextLine(reader);
+            if(line == null)
+                throw new Exception();
             String[] parts = parseStrings(line);
             if(parts.length != 2 && parts.length != 3)
                 throw new Exception();
             User user;
             if(parts[0].equals("Staff") && parts.length == 2){
                 user = new Staff(parts[1]);
-                if(userSystem.get(user.name) != null)
+                if(getUser(user.name) != null)
                     throw new Exception();
                 userSystem.put(user.name, new StaffLibrarySystem(real, (Staff)user));
                 users.put(user.name, user);
@@ -88,7 +106,7 @@ public class LibrarySystem {
                 if(Integer.parseInt(parts[2]) <= 0)
                     throw new Exception();
                 user = new Borrower(parts[1], Integer.parseInt(parts[2]));
-                if(userSystem.get(user.name) != null)
+                if(getUser(user.name) != null)
                     throw new Exception();
                 userSystem.put(user.name, new BorrowerLibrarySystem(real, (Borrower)user));
                 users.put(user.name, user);
@@ -102,15 +120,7 @@ public class LibrarySystem {
         }
     }
 
-    public static ILibrarySystem getSystem(String name){
-        return userSystem.get(name);
-    }
-
-    public static User getUser(String name){
-        return users.get(name);
-    }
-
-    public static void addBook(BufferedReader reader, String[] parts){
+    static void addBook(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 2)
                 throw new Exception();
@@ -128,7 +138,7 @@ public class LibrarySystem {
         }
     }
 
-    public static void removeBook(BufferedReader reader, String[] parts){
+    static void removeBook(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
@@ -147,7 +157,7 @@ public class LibrarySystem {
         }
     }
 
-    public static void checkout(BufferedReader reader, String[] parts){
+    static void checkout(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
@@ -168,14 +178,14 @@ public class LibrarySystem {
                     throw new Exception();
                 books.add(b);
             }
-            system.checkoutBook(books, user);
+            system.checkout(books, user);
         } catch(Exception e){
             displayError();
             return;
         }
     }
 
-    public static void returnIns(BufferedReader reader, String[] parts){
+    static void returnIns(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
@@ -191,14 +201,14 @@ public class LibrarySystem {
         }
     }
 
-    public static void listAuthor(BufferedReader reader, String[] parts){
+    static void listAuthor(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
             ILibrarySystem system = getSystem(parts[0]);
             if(system == null)
                 throw new Exception();
-            ArrayList<Book> books = system.getBooksByAuthor(parts[2]);
+            ArrayList<Book> books = system.getBookByAuthor(parts[2]);
             printBooks(books);
 
         } catch(Exception e){
@@ -207,31 +217,33 @@ public class LibrarySystem {
         }
     }
 
-    public static void listSubject(BufferedReader reader, String[] parts){
+    static void listSubject(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
             ILibrarySystem system = getSystem(parts[0]);
             if(system == null)
                 throw new Exception();
-            ArrayList<Book> books = system.getBooksBySubject(parts[2]);
+            ArrayList<Book> books = system.getBookBySubject(parts[2]);
             printBooks(books);
+
         } catch(Exception e){
             displayError();
             return;
         }
     }
 
-    public static void findChecked(BufferedReader reader, String[] parts){
+    static void findChecked(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
             ILibrarySystem system = getSystem(parts[0]);
-            if(system == null)
-                throw new Exception();
             Borrower user = (Borrower) getUser(parts[2]);
 
-            ArrayList<Book> books = system.getCheckedoutBookByBorrower(user);
+            if(system == null || user == null)
+                throw new Exception();
+
+            ArrayList<Book> books = system.getBookByBorrower(user);
             if(books != null)
                 printBooks(books);
         } catch(Exception e){
@@ -240,7 +252,7 @@ public class LibrarySystem {
         }
     }
 
-    public static void BorrowerIns(BufferedReader reader, String[] parts){
+    static void BorrowerIns(BufferedReader reader, String[] parts){
         try{
             if(parts.length != 3)
                 throw new Exception();
@@ -250,18 +262,13 @@ public class LibrarySystem {
             if(system == null || b == null)
                 throw new Exception();
             
-            Borrower user = system.getBorrowerByBook(b);
-            System.out.printf("User: %s\n", user.name);
+            Borrower user = system.getLastBorrowerByBook(b);
+            if(user != null)
+                System.out.printf("User: %s\n", user.name);
 
         } catch(Exception e){
             displayError();
             return;
-        }
-    }
-
-    public static void printBooks(ArrayList<Book> books){
-        for(Book b : books){
-            System.out.printf("ID: %d Author: %s Subject: %s\n", b.id, b.author, b.subject);
         }
     }
 
