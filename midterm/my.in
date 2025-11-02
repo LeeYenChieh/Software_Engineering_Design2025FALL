@@ -25,4 +25,4 @@ UserB checkout UserD
 3 4
 UserA return 1
 UserB return 3
-UserA Borrower 8
+UserC listSubject Subject2

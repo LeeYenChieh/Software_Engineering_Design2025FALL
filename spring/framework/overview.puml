@@ -1,0 +1,86 @@
+@startuml overview
+
+package aop{
+    class TargetClassAware{
+
+    }
+}
+
+interface Advised{
+--
+管理target, advisor之類的配置的地方
+}
+
+class ProxyConfig{
+--
+放各種setting的地方
+}
+
+class AdvisedSupport{
+--
+實作Advised，管理通知advisor
+}
+
+class ProxyCreatorSupport{
+    - aopProxyFactory: AopProxyFactory
+    + createAopProxy(): AopProxy
+--
+proxy factory的基礎類別
+用一個簡單的方式使用AopProxyFactory
+}
+
+ProxyCreatorSupport ..> AopProxyFactory : use
+
+class ProxyFactory{
+--
+簡單的得到AopProxy
+}
+
+TargetClassAware <|-- Advised
+Advised <|.. AdvisedSupport
+ProxyConfig <|-- AdvisedSupport
+AdvisedSupport <|-- ProxyCreatorSupport
+ProxyCreatorSupport <|-- ProxyFactory
+
+interface AopProxyFactory{
+    + createAopProx(): AopProxy
+}
+
+class DefaultAopProxyFactory{
+--
+根據條件create AopProxy
+**simple factory pattern**
+}
+
+note bottom of DefaultAopProxyFactory
+if(cond A)
+    create ObjenesisCglibAopProxy
+else if(cond B)
+    create JdkDynamicAopProxy
+end note
+
+AopProxyFactory <|.. DefaultAopProxyFactory
+
+interface AopProxy{
+
+}
+
+class CglibAopProxy{
+
+}
+
+class ObjenesisCglibAopProxy{
+
+}
+
+CglibAopProxy <|-- ObjenesisCglibAopProxy
+
+class JdkDynamicAopProxy{
+
+}
+
+AopProxy <|.. CglibAopProxy
+AopProxy <|.. JdkDynamicAopProxy
+AopProxyFactory ..> AopProxy : create
+
+@enduml
