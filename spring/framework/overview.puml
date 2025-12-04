@@ -17,23 +17,53 @@ class ProxyConfig{
 }
 
 class AdvisedSupport{
+    + adviseChanged()
 --
 實作Advised，管理通知advisor
 }
 
 class ProxyCreatorSupport{
+    - listeners: AdvisedSupportListener[]
     - aopProxyFactory: AopProxyFactory
+    + adviseChanged()
+    + activate()
     + createAopProxy(): AopProxy
 --
 proxy factory的基礎類別
 用一個簡單的方式使用AopProxyFactory
+**Observer pattern**
 }
 
+note right of ProxyCreatorSupport
+void adviseChanged(){
+    for l in listeners
+        l.adviseChanged()
+}
+
+void activate(){
+    for l in listeners
+        l.activate()
+}
+end note
+
 ProxyCreatorSupport ..> AopProxyFactory : use
+
+interface AdvisedSupportListener{
+    + activate()
+    + adviceChanged()
+}
+
+ProxyCreatorSupport --> AdvisedSupportListener : notify
+AdvisedSupportListener --> ProxyCreatorSupport : attach
 
 class ProxyFactory{
 --
 簡單的得到AopProxy
+}
+
+class ProxyFactoryBean{
+--
+用XML之類的建立proxy 
 }
 
 TargetClassAware <|-- Advised
@@ -41,9 +71,12 @@ Advised <|.. AdvisedSupport
 ProxyConfig <|-- AdvisedSupport
 AdvisedSupport <|-- ProxyCreatorSupport
 ProxyCreatorSupport <|-- ProxyFactory
+ProxyCreatorSupport <|-- ProxyFactoryBean
 
 interface AopProxyFactory{
     + createAopProx(): AopProxy
+    --
+    **Strategy pattern**
 }
 
 class DefaultAopProxyFactory{
@@ -62,7 +95,10 @@ end note
 AopProxyFactory <|.. DefaultAopProxyFactory
 
 interface AopProxy{
-
+    + getProxy(): Object
+    --
+    產生負責處理切面的Proxy
+    **Strategy Pattern**
 }
 
 class CglibAopProxy{

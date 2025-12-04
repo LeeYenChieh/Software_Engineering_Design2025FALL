@@ -1,0 +1,53 @@
+@startuml step3
+abstract class AbstractApplication{
+    + document: Document
+    + openDocument()
+    + checkCanOpen()
+    + {abstract} createDocument()
+    + addDocument()
+    + {abstract} readDocument()
+}
+
+note right of AbstractApplication
+void openDocument(){
+    checkCanOpen()
+    createDocument()
+    addDocument()
+    readDocument()
+}
+end note
+
+class TextApplication{
+    + createDocument()
+    + readDocument()
+}
+
+class SpreadSheetApplication{
+    + createDocument()
+    + readDocument()
+}
+
+
+AbstractApplication <|-- TextApplication
+AbstractApplication <|-- SpreadSheetApplication
+
+
+
+abstract class Document{
+
+}
+
+class TextDocument{
+
+}
+
+class SpreadSheetDocument{
+
+}
+
+Document <|-- TextDocument
+Document <|-- SpreadSheetDocument
+
+
+AbstractApplication *-- Document
+@enduml

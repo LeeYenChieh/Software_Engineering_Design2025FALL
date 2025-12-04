@@ -1,0 +1,27 @@
+@startuml init1
+
+class TextApplication{
+    + textDocument: TextDocument
+    + openDocument()
+    + checkCanOpen()
+    + createDocument()
+    + addDocument()
+    + readDocument()
+}
+
+note right of TextApplication
+void openDocument(){
+    checkCanOpen();
+    createDocument();
+    addDocument();
+    readDocument();
+}
+end note
+
+class TextDocument{
+
+}
+
+TextApplication *-- TextDocument
+
+@enduml

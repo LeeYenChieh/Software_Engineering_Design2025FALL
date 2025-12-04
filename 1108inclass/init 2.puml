@@ -1,0 +1,12 @@
+@startuml init1
+class PancakeHouse{
+    + menu: Menu
+}
+
+class Menu{
+    + items: []
+}
+
+PancakeHouse *-- Menu
+
+@enduml

@@ -1,0 +1,52 @@
+@startuml init2
+
+class TextApplication{
+    + textDocument: TextDocument
+    + openDocument()
+    + checkCanOpen()
+    + createDocument()
+    + addDocument()
+    + readDocument()
+}
+
+note right of TextApplication
+void openDocument(){
+    checkCanOpen();
+    createDocument();
+    addDocument();
+    readDocument();
+}
+end note
+
+class TextDocument{
+
+}
+
+TextApplication *-- TextDocument
+
+class SpreadSheetApplication{
+    + spreadSheetDocument: SpreadSheetDocument
+    + openDocument()
+    + checkCanOpen()
+    + createDocument()
+    + addDocument()
+    + readDocument()
+}
+
+note right of SpreadSheetApplication
+void openDocument(){
+    checkCanOpen();
+    createDocument();
+    addDocument();
+    readDocument();
+}
+end note
+
+class SpreadSheetDocument{
+
+}
+
+SpreadSheetApplication *-- SpreadSheetDocument
+
+
+@enduml
