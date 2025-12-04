@@ -1,0 +1,115 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam noteBackgroundColor #FFFFAA
+skinparam noteBorderColor #DDAA00
+skinparam packageStyle rectangle
+
+package "Configuration & Client API" {
+    class ProxyConfig {
+        - proxyTargetClass : boolean
+        - optimize : boolean
+        - opaque : boolean
+        - exposeProxy : boolean
+        - frozen : boolean
+    }
+
+    class AdvisedSupport {
+        - targetSource : TargetSource
+        - advisors : List<Advisor>
+        - interfaces : List<Class>
+        + getInterceptorsAndDynamicInterceptionAdvice()
+    }
+
+    class ProxyFactory {
+        + getProxy() : Object
+        + getProxy(ClassLoader) : Object
+    }
+}
+
+package "Factory Strategy (Factory Pattern)" {
+    interface AopProxyFactory {
+        + createAopProxy(AdvisedSupport) : AopProxy
+    }
+
+    class DefaultAopProxyFactory {
+        + createAopProxy(AdvisedSupport) : AopProxy
+    }
+}
+
+package "Proxy Strategies (Strategy Pattern)" {
+    interface AopProxy {
+        + getProxy() : Object
+        + getProxy(ClassLoader) : Object
+    }
+
+    class JdkDynamicAopProxy {
+        + getProxy() : Object
+        + invoke(Object, Method, Object[]) : Object
+    }
+
+    class CglibAopProxy {
+        + getProxy() : Object
+    }
+}
+
+package "Runtime Execution (Chain of Responsibility)" {
+    interface MethodInvocation
+    
+    class ReflectiveMethodInvocation {
+        - interceptorsAndDynamicMethodMatchers : List
+        - currentInterceptorIndex : int
+        + proceed() : Object
+    }
+
+    interface MethodInterceptor {
+        + invoke(MethodInvocation) : Object
+    }
+}
+
+' Relationships & Inheritance
+ProxyConfig <|-- AdvisedSupport
+AdvisedSupport <|-- ProxyFactory
+
+' Factory Pattern connection
+ProxyFactory --> AopProxyFactory : uses
+AopProxyFactory <|.. DefaultAopProxyFactory
+DefaultAopProxyFactory ..> JdkDynamicAopProxy : creates
+DefaultAopProxyFactory ..> CglibAopProxy : creates
+
+' Strategy Pattern connection
+AopProxy <|.. JdkDynamicAopProxy
+AopProxy <|.. CglibAopProxy
+
+' Runtime Execution connection
+JdkDynamicAopProxy ..> ReflectiveMethodInvocation : creates & launches
+ReflectiveMethodInvocation ..|> MethodInvocation
+ReflectiveMethodInvocation o--> MethodInterceptor : iterates over
+
+' Design Pattern Notes
+note right of AopProxyFactory
+  <b>Abstract Factory / Factory Method</b>
+  負責封裝 "如何產生代理" 的邏輯
+  隱藏了 JDK vs CGLIB 的判斷細節
+end note
+
+note top of AopProxy
+  <b>Strategy Pattern</b>
+  定義代理生成的統一介面。
+  讓上層(ProxyFactory)不用管底層
+  是 Bytecode 還是 Reflection
+end note
+
+note right of JdkDynamicAopProxy
+  <b>Proxy Pattern (Implementation)</b>
+  這同時也是 JDK 的 InvocationHandler。
+  所有的 Target Method call 都會先
+  進入這裡的 invoke() 方法
+end note
+
+note bottom of ReflectiveMethodInvocation
+  <b>Chain of Responsibility</b>
+  負責管理攔截器鏈 (Interceptor Chain)。
+  透過遞迴/迴圈的方式依序呼叫 Advice
+end note
+
+@enduml

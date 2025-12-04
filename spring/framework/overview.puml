@@ -17,6 +17,8 @@ class ProxyConfig{
 }
 
 class AdvisedSupport{
+    + setTarget(target)
+    + addAdvisor(Advisor)
     + adviseChanged()
 --
 實作Advised，管理通知advisor
@@ -25,6 +27,7 @@ class AdvisedSupport{
 class ProxyCreatorSupport{
     - listeners: AdvisedSupportListener[]
     - aopProxyFactory: AopProxyFactory
+    + setAopProxyFactory(AopProxyFactory)
     + adviseChanged()
     + activate()
     + createAopProxy(): AopProxy
@@ -44,9 +47,13 @@ void activate(){
     for l in listeners
         l.activate()
 }
+
+AopProxy createAopProxy(){
+    return this.aopProxyFactory.createAopProxy()
+}
 end note
 
-ProxyCreatorSupport ..> AopProxyFactory : use
+ProxyCreatorSupport --> AopProxyFactory
 
 interface AdvisedSupportListener{
     + activate()
@@ -64,6 +71,7 @@ class ProxyFactory{
 class ProxyFactoryBean{
 --
 用XML之類的建立proxy 
+**Strategy Pattern的不同Context**
 }
 
 TargetClassAware <|-- Advised
@@ -98,7 +106,6 @@ interface AopProxy{
     + getProxy(): Object
     --
     產生負責處理切面的Proxy
-    **Strategy Pattern**
 }
 
 class CglibAopProxy{

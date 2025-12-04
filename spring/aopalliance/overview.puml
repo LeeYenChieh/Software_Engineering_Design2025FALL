@@ -1,0 +1,51 @@
+@startuml overview
+interface Advise{
+
+}
+
+interface Interceptor{
+--
+卡在方法執行的中間
+決定要不要修改參數或者修改回傳值
+}
+
+Advise <|-- Interceptor
+
+interface Jointpoint{
+    + proceed(): Object
+    + getThis(): Object
+    --
+    proceed可以讓method繼續跑
+}
+
+interface Invocation{
+    + getArguments(): Object[]
+--
+把「函式呼叫」這個動作封裝成的物件
+}
+
+Jointpoint <|-- Invocation
+
+interface MethodInterceptor{
+
+}
+
+interface MethodInvocation{
+    + getMethod(): Method
+}
+
+Interceptor <|-- MethodInterceptor
+Invocation <|-- MethodInvocation
+
+
+interface ConstructorInterceptor{
+
+}
+
+interface ConstructorInvocation{
+    + getConstructor(): Constructor
+}
+
+Interceptor <|-- ConstructorInterceptor
+Invocation <|-- ConstructorInvocation
+@enduml
