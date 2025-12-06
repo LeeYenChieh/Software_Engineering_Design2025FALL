@@ -1,0 +1,55 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+
+title JDK Dynamic Proxy Mapping (Standard Proxy Pattern)
+
+package "Abstract Pattern Roles" {
+    interface "UserService\n<<Subject>>" as Subject {
+        + login()
+        + logout()
+    }
+}
+
+package "Spring / JDK Implementation" {
+    class "UserServiceImpl\n<<RealSubject>>" as RealSubject {
+        + login()
+        + logout()
+    }
+
+    class "$Proxy0\n<<Proxy>>" as Proxy {
+        - h : InvocationHandler
+        + login()
+        + logout()
+    }
+
+    class "JdkDynamicAopProxy\n<<Mediator / Adapter>>" as Handler {
+        - target : Object (RealSubject)
+        + invoke(proxy, method, args)
+    }
+}
+
+' Relationships
+RealSubject .up.|> Subject : implements
+Proxy .up.|> Subject : implements
+
+' The connection
+Proxy o-right-> Handler : has-a (h)
+Handler -down-> RealSubject : delegates to (reflection)
+
+note right of Proxy
+  <b>Runtime Generated Class</b>
+  1. 實作了 Subject 介面
+  2. 將所有方法呼叫轉發給 h.invoke()
+end note
+
+note right of Handler
+  <b>Spring's Brain</b>
+  1. 這裡不是標準 Proxy Pattern 的一部分，
+     但在 Java 動態代理中，它是 Proxy 的靈魂。
+  2. 它負責執行 Advice Chain。
+end note
+
+@enduml

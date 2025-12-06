@@ -1,0 +1,138 @@
+@startuml adapter
+skinparam linetype ortho
+
+package other{
+    interface MethodInvocation{
+        + proceed()
+    }
+
+    interface MethodInterceptor{
+        + invoke(MethodInvocation)
+    }
+
+    MethodInterceptor --> MethodInvocation
+
+    interface BeforeAdvice{
+
+    }
+
+    interface AfterAdvice{
+
+    }
+
+    interface MethodBeforeAdvice{
+        
+    }
+
+    interface AfterReturningAdvice{
+
+    }
+}
+
+class MethodBeforeAdviceInterceptor{
+    + advice: MethodBeforeAdvice
+    + invoke(MethodInvocation)
+}
+
+note bottom of MethodBeforeAdviceInterceptor
+Object invoke(MethodInvocation mi){
+    this.advice.before()
+    mi.proceed();
+}
+end note
+
+class AfterReturningAdviceInterceptor{
+    + advice: AfterReturningAdvice
+    + invoke(MethodInvocation)
+}
+
+note bottom of AfterReturningAdviceInterceptor
+Object invoke(MethodInvocation mi){
+    mi.proceed();
+    this.advice.afterReturing()
+}
+end note
+
+MethodInterceptor <|.. MethodBeforeAdviceInterceptor
+BeforeAdvice <|.. MethodBeforeAdviceInterceptor
+MethodInterceptor <|.. AfterReturningAdviceInterceptor
+AfterAdvice <|.. AfterReturningAdviceInterceptor
+
+MethodBeforeAdviceInterceptor --> MethodBeforeAdvice
+AfterReturningAdviceInterceptor --> AfterReturningAdvice
+
+interface AdvisorAdapter{
+    + getInterceptor(Advisor): MethodInterceptor
+    --
+    **Factory pattern**
+}
+
+class MethodBeforeAdviceAdapter{
+    + getInterceptor(Advisor): MethodBeforeAdviceInterceptor
+}
+
+class AfterReturningAdviceAdapter{
+    + getInterceptor(Advisor): AfterReturningAdviceInterceptor
+}
+
+AdvisorAdapter <|.. AfterReturningAdviceAdapter
+AdvisorAdapter <|.. MethodBeforeAdviceAdapter
+AfterReturningAdviceAdapter ..> AfterReturningAdviceInterceptor: <<create>>
+MethodBeforeAdviceAdapter ..> MethodBeforeAdviceInterceptor: <<create>>
+
+
+class AdvisorAdapterRegistrationManager{
+    + advisorAdapterRegistry: AdvisorAdapterRegistry=GlobalAdvisorAdapterRegistry.getInstance
+    + setAdvisorAdapterRegistry(AdvisorAdapterRegistry)
+    + postProcessAfterInitialization(AdvisorAdapter)
+    --
+    **Strategy Pattern(Register)**
+}
+
+
+note right of AdvisorAdapterRegistrationManager
+Object postProcessAfterInitialization(AdvisorAdapter){
+    this.advisorAdapterRegistry.registerAdvisorAdapter(AdvisorAdapter)
+}
+
+end note
+
+class GlobalAdvisorAdapterRegistry{
+    + advisorAdapterRegistry: AdvisorAdapterRegistry=DefaultAdvisorAdapterRegistry()
+    + getInstance(): AdvisorAdapterRegistry
+    --
+    **Singleton Pattern**
+    全域唯一註冊表，預設是DefaultAdvisorAdapterRegistry
+}
+
+AdvisorAdapterRegistrationManager --> GlobalAdvisorAdapterRegistry
+GlobalAdvisorAdapterRegistry ..> DefaultAdvisorAdapterRegistry :<<create>>
+
+interface AdvisorAdapterRegistry{
+    + getInterceptors(Advisor): MethodInterceptor[]
+    + registerAdvisorAdapter(AdvisorAdapter)
+}
+
+class DefaultAdvisorAdapterRegistry{
+    + advisorAdapter: AdvisorAdapter[]
+    + getInterceptors(Advisor): MethodInterceptor[]
+    + registerAdvisorAdapter(AdvisorAdapter)
+}
+
+note right of DefaultAdvisorAdapterRegistry
+MethodInterceptor[] getInterceptors(Advisor){
+    interceptors = new MethodInterceptor[]
+    for (adapter : this.adapters) {
+        if (adapter supports Advice) {
+            interceptors.add(adapter.getInterceptor(advisor));
+        }
+    }
+    return interceptors
+}
+end note
+
+AdvisorAdapterRegistrationManager --> AdvisorAdapterRegistry
+AdvisorAdapterRegistry <|.. DefaultAdvisorAdapterRegistry
+DefaultAdvisorAdapterRegistry o-- AdvisorAdapter
+
+@enduml

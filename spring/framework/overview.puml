@@ -1,12 +1,14 @@
 @startuml overview
 
+skinparam linetype ortho
+
 package aop{
     class TargetClassAware{
 
     }
 }
 
-interface Advised{
+interface Adviced{
 --
 管理target, advisor之類的配置的地方
 }
@@ -16,19 +18,33 @@ class ProxyConfig{
 放各種setting的地方
 }
 
-class AdvisedSupport{
+class AdvicedSupport{
+    + advisorChainFactory: AdvisorChainFactory
     + setTarget(target)
+    + setAdvisorChainFactory(AdvisorChainFactory)
     + addAdvisor(Advisor)
-    + adviseChanged()
+    + adviceChanged()
+    + getInterceptorsAndDynamicInterceptionAdvice(): List<Object>
 --
-實作Advised，管理通知advisor
+實作Adviced，管理通知advisor
 }
 
+interface AdvisorChainFactory{
+    + getInterceptorsAndDynamicInterceptionAdvice(): List<Object>
+} 
+
+class DefaultAdvisorChainFactory{
+    + getInterceptorsAndDynamicInterceptionAdvice(): List<Object>
+}
+
+AdvisorChainFactory <|.. DefaultAdvisorChainFactory
+AdvicedSupport -> AdvisorChainFactory
+
 class ProxyCreatorSupport{
-    - listeners: AdvisedSupportListener[]
+    - listeners: AdvicedSupportListener[]
     - aopProxyFactory: AopProxyFactory
     + setAopProxyFactory(AopProxyFactory)
-    + adviseChanged()
+    + adviceChanged()
     + activate()
     + createAopProxy(): AopProxy
 --
@@ -38,9 +54,9 @@ proxy factory的基礎類別
 }
 
 note right of ProxyCreatorSupport
-void adviseChanged(){
+void adviceChanged(){
     for l in listeners
-        l.adviseChanged()
+        l.adviceChanged()
 }
 
 void activate(){
@@ -55,29 +71,43 @@ end note
 
 ProxyCreatorSupport --> AopProxyFactory
 
-interface AdvisedSupportListener{
+interface AdvicedSupportListener{
     + activate()
     + adviceChanged()
 }
 
-ProxyCreatorSupport --> AdvisedSupportListener : notify
-AdvisedSupportListener --> ProxyCreatorSupport : attach
+ProxyCreatorSupport --> AdvicedSupportListener : notify
+AdvicedSupportListener --> ProxyCreatorSupport : attach
 
 class ProxyFactory{
+    + getProxy(): Object
 --
 簡單的得到AopProxy
 }
 
 class ProxyFactoryBean{
+    + getProxy(): Object
 --
-用XML之類的建立proxy 
+在IOC容器中管理Proxy
 **Strategy Pattern的不同Context**
 }
 
-TargetClassAware <|-- Advised
-Advised <|.. AdvisedSupport
-ProxyConfig <|-- AdvisedSupport
-AdvisedSupport <|-- ProxyCreatorSupport
+note bottom of ProxyFactory
+Object getProxy(){
+    return createAopProxy().getProxy();
+}
+end note
+
+note bottom of ProxyFactoryBean
+Object getProxy(AopProxy aopProxy) {
+    return aopProxy.getProxy();
+}
+end note
+
+TargetClassAware <|-- Adviced
+Adviced <|.. AdvicedSupport
+ProxyConfig <|-- AdvicedSupport
+AdvicedSupport <|-- ProxyCreatorSupport
 ProxyCreatorSupport <|-- ProxyFactory
 ProxyCreatorSupport <|-- ProxyFactoryBean
 
@@ -109,7 +139,8 @@ interface AopProxy{
 }
 
 class CglibAopProxy{
-
+    --
+    Cglib方法創建AopProxy
 }
 
 class ObjenesisCglibAopProxy{
@@ -119,11 +150,35 @@ class ObjenesisCglibAopProxy{
 CglibAopProxy <|-- ObjenesisCglibAopProxy
 
 class JdkDynamicAopProxy{
-
+    JdkDynamic方法創建AopProxy
 }
 
 AopProxy <|.. CglibAopProxy
 AopProxy <|.. JdkDynamicAopProxy
 AopProxyFactory ..> AopProxy : create
+
+package aoplliance{
+    interface MethodInvocation{
+        + proceed()
+    }
+
+    interface MethodInterceptor{
+        + invoke(MethodInvocation)
+    }
+
+    MethodInterceptor --> MethodInvocation
+}
+
+class ReflectiveMethodInvocation{
+    + interceptor: MethodInterceptor[]
+    + proceed()
+    --
+    輪流執行這個Invocation(Method)前後的MethodInterceptor
+}
+
+ReflectiveMethodInvocation o-- MethodInterceptor
+MethodInvocation <|.. ReflectiveMethodInvocation
+ObjenesisCglibAopProxy --> ReflectiveMethodInvocation
+JdkDynamicAopProxy --> ReflectiveMethodInvocation
 
 @enduml

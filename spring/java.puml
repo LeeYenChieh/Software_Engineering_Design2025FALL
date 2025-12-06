@@ -1,0 +1,59 @@
+@startuml java
+skinparam linetype ortho
+
+package "aopalliance" {
+    interface Advice {
+        --
+        aspect要做什麼
+    }
+}
+
+    
+interface BeforeAdvice
+interface AfterAdvice
+interface ThrowsAdvice
+
+interface MethodBeforeAdvice {
+    + before()
+}
+
+interface AfterReturningAdvice {
+    + afterReturning()
+}
+
+interface Advisor {
+    + getAdvice() : Advice
+}
+
+interface PointcutAdvisor {
+    + getPointcut() : Pointcut
+    --
+    包含了ponitcut與advice
+}
+
+interface Pointcut {
+    + getClassFilter() : ClassFilter
+    + getMethodMatcher() : MethodMatcher
+    --
+    要在哪裡做advice
+}
+
+interface TargetSource {
+    + getTarget() : Object
+    --
+    用來拿到Target
+    Target是User做出的class
+}
+
+' Relationships
+Advice <|-- BeforeAdvice
+Advice <|-- AfterAdvice
+BeforeAdvice <|-- MethodBeforeAdvice
+AfterAdvice <|-- AfterReturningAdvice
+AfterAdvice <|-- ThrowsAdvice
+
+Advisor o-right- Advice
+PointcutAdvisor -up-|> Advisor
+PointcutAdvisor o-down- Pointcut
+
+@enduml

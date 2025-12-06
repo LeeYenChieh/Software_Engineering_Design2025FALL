@@ -1,0 +1,14 @@
+@startuml singleton
+class GlobalAdvisorAdapterRegistry <<Singleton>>{
+    + advisorAdapterRegistry: AdvisorAdapterRegistry=new DefaultAdvisorAdapterRegistry()
+    + getInstance(): AdvisorAdapterRegistry
+}
+
+interface AdvisorAdapterRegistry{
+    + getInterceptors(Advisor): MethodInterceptor[]
+    + registerAdvisorAdapter(AdvisorAdapter)
+}
+
+GlobalAdvisorAdapterRegistry o--"1" AdvisorAdapterRegistry
+
+@enduml

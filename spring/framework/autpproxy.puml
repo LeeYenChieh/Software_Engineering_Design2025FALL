@@ -1,0 +1,53 @@
+@startuml autoproxy
+skinparam linetype ortho
+
+abstract class AbstractAutoProxyCreator {
+    - interceptorNames : String[]
+    - targetSourceCreators : TargetSourceCreator[]
+    --
+    + postProcessAfterInitialization(Object, String) : Object
+    + getEarlyBeanReference(Object, String) : Object
+    # wrapIfNecessary(Object, String, Object) : Object
+    # createProxy(Class, String, Object[], TargetSource) : Object
+    # {abstract} getAdvicesAndAdvisorsForBean(Class, String, TargetSource) : Object[]
+    --
+    **template pattern**
+}
+
+class BeanNameAutoProxyCreator {
+    - beanNames : List<String>
+    --
+    # getAdvicesAndAdvisorsForBean(...) : Object[]
+}
+
+abstract class AbstractAdvisorAutoProxyCreator {
+    --
+    # getAdvicesAndAdvisorsForBean(...) : Object[]
+    # findCandidateAdvisors() : List<Advisor>
+}
+
+class DefaultAdvisorAutoProxyCreator {
+    --
+    This is the standard implementation
+    for XML based configuration
+}
+
+class InfrastructureAdvisorAutoProxyCreator {
+    --
+    Used for internal infrastructure
+    (e.g., @Transactional)
+}
+
+interface TargetSourceCreator {
+    + getTargetSource(Class, String) : TargetSource
+}
+
+AbstractAutoProxyCreator o-right- TargetSourceCreator
+AbstractAutoProxyCreator <|-- BeanNameAutoProxyCreator
+AbstractAutoProxyCreator <|-- AbstractAdvisorAutoProxyCreator
+
+AbstractAdvisorAutoProxyCreator <|-- DefaultAdvisorAutoProxyCreator
+AbstractAdvisorAutoProxyCreator <|-- InfrastructureAdvisorAutoProxyCreator
+
+
+@enduml

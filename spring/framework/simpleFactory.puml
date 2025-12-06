@@ -1,0 +1,37 @@
+@startuml simpleFactory
+skinparam linetype ortho
+
+class DefaultAopProxyFactory{
+    + createAopProx(): AopProxy
+}
+
+note bottom of DefaultAopProxyFactory
+if(cond A)
+    create ObjenesisCglibAopProxy
+else if(cond B)
+    create JdkDynamicAopProxy
+end note
+
+interface AopProxy{
+    + getProxy(): Object
+}
+
+class CglibAopProxy{
+    + getProxy(): Object
+}
+
+class ObjenesisCglibAopProxy{
+    + getProxy(): Object
+}
+
+CglibAopProxy <|-- ObjenesisCglibAopProxy
+
+class JdkDynamicAopProxy{
+    + getProxy(): Object
+}
+
+AopProxy <|.. CglibAopProxy
+AopProxy <|.. JdkDynamicAopProxy
+DefaultAopProxyFactory ..> AopProxy : create
+
+@enduml

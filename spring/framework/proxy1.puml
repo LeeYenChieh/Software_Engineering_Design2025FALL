@@ -1,0 +1,48 @@
+@startuml proxy1
+
+skinparam linetype ortho
+interface IUserService {
+    + method()
+}
+
+class UserServiceImpl{
+    + method()
+}
+
+package proxy{
+class $Proxy0 {
+    - h : InvocationHandler
+    + method()
+}
+
+interface InvocationHandler{
+    + invoke()
+}
+
+class JdkDynamicAopProxy {
+    + invoke()
+}
+
+class ReflectiveMethodInvocation {
+    + proceed()
+}
+}
+
+JdkDynamicAopProxy --> ReflectiveMethodInvocation
+InvocationHandler <|.. JdkDynamicAopProxy
+
+IUserService <|. UserServiceImpl
+IUserService <|.left. $Proxy0
+
+' The connection
+$Proxy0 o--> InvocationHandler
+ReflectiveMethodInvocation --> UserServiceImpl
+JdkDynamicAopProxy ..> $Proxy0: <<create>>
+
+note left of $Proxy0
+$Proxy0 是 JdkDynamicAopProxy
+通過java.lang.reflect.Proxy創建的Proxy
+會把method轉發給InvocationHandler的invoke
+end note
+
+@enduml

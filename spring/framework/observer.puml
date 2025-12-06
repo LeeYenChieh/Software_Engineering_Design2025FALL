@@ -1,0 +1,35 @@
+@startuml observer
+class ProxyCreatorSupport{
+    - listeners: AdvicedSupportListener[]
+    - aopProxyFactory: AopProxyFactory
+    + setAopProxyFactory(AopProxyFactory)
+    + createAopProxy(): AopProxy
+    + adviceChanged()
+    + activate()
+}
+
+note right of ProxyCreatorSupport
+void adviceChanged(){
+    for l in listeners
+        l.adviceChanged()
+}
+
+void activate(){
+    for l in listeners
+        l.activate()
+}
+
+AopProxy createAopProxy(){
+    return this.aopProxyFactory.createAopProxy()
+}
+end note
+
+interface AdvicedSupportListener{
+    + activate()
+    + adviceChanged()
+}
+
+ProxyCreatorSupport --> AdvicedSupportListener : notify
+AdvicedSupportListener --> ProxyCreatorSupport : attach
+
+@enduml

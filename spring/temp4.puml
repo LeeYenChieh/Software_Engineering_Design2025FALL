@@ -1,0 +1,43 @@
+@startuml proxy_corrected
+skinparam linetype ortho
+
+class UserService {
+    + method()
+}
+
+class "UserService$$EnhancerBySpringCGLIB" as Proxy {
+    - callback : MethodInterceptor
+    + method()
+}
+
+interface MethodInterceptor {
+    + intercept()
+}
+
+' Relationships
+Proxy -up-|> UserService : extends
+
+' The Delegation
+Proxy o-right-> MethodInterceptor : delegates to
+
+note right of Proxy
+// 這是 CGLIB 的核心行為
+void method() {
+    // 1. 不直接呼叫 super
+    // 2. 而是轉發給攔截器 (Advice Chain 在這裡)
+    callback.intercept(this, method, args, methodProxy);
+}
+end note
+
+note bottom of MethodInterceptor
+// 攔截器內部才會決定
+// 何時 (以及是否) 要呼叫 super
+void intercept(...) {
+   runBeforeAdvice();
+   // 透過 MethodProxy 呼叫父類別
+   proxy.invokeSuper(obj, args); 
+   runAfterAdvice();
+}
+end note
+
+@enduml

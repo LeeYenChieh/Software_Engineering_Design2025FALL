@@ -1,0 +1,67 @@
+@startuml chain
+skinparam linetype ortho
+
+together{
+    class ReflectiveMethodInvocation{
+        + curIdx: int=-1
+        + interceptor: MethodInterceptor[]
+        + proceed()
+    }
+
+    interface MethodInvocation{
+        + proceed(): Object
+    }
+}
+
+MethodInvocation <|.. ReflectiveMethodInvocation
+
+together{
+    interface MethodInterceptor{
+        + invoke(MethodInvocation): Object
+    }
+
+    class MethodBeforeAdviceInterceptor{
+        + advice: MethodBeforeAdvice
+        + invoke(MethodInvocation)
+    }
+
+
+    class AfterReturningAdviceInterceptor{
+        + advice: AfterReturningAdvice
+        + invoke(MethodInvocation)
+    }
+}
+
+MethodInterceptor <|.. MethodBeforeAdviceInterceptor
+MethodInterceptor <|.. AfterReturningAdviceInterceptor
+
+ReflectiveMethodInvocation o--- MethodInterceptor
+
+note right of ReflectiveMethodInvocation
+Object proceed(){
+    if curIdx === len(this.interceptor)
+        return
+    for inteceptor in this.interceptor{
+        curIdx += 1
+        **inteceptor.invoke(this)**
+    }
+}
+end note
+
+note bottom of AfterReturningAdviceInterceptor
+Object invoke(MethodInvocation mi){
+    **mi.proceed();**
+    this.advice.afterReturing()
+}
+end note
+
+note bottom of MethodBeforeAdviceInterceptor
+Object invoke(MethodInvocation mi){
+    this.advice.before()
+    **mi.proceed();**
+}
+end note
+
+MethodInterceptor --> MethodInvocation
+
+@enduml

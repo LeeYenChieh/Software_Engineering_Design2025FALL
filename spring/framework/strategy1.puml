@@ -1,0 +1,31 @@
+@startuml strategy1
+
+class AdvisedSupport{
+    + advisorChainFactory: AdvisorChainFactory
+    + setAdvisorChainFactory(AdvisorChainFactory)
+    + getInterceptorsAndDynamicInterceptionAdvice(): List<Object>
+}
+
+note bottom of AdvisedSupport
+List<Object> getInterceptorsAndDynamicInterceptionAdvice(){
+    this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice()
+}
+end note
+
+interface AdvisorChainFactory{
+    + getInterceptorsAndDynamicInterceptionAdvice(): List<Object>
+} 
+
+class DefaultAdvisorChainFactory{
+    + getInterceptorsAndDynamicInterceptionAdvice(): List<Object>
+}
+
+AdvisorChainFactory <|.. DefaultAdvisorChainFactory
+AdvisedSupport -> AdvisorChainFactory
+
+note bottom of DefaultAdvisorChainFactory
+List<Object> getInterceptorsAndDynamicInterceptionAdvice(){
+    return GlobalAdvisorAdapterRegistry.getInstance().getInterceptors()
+}
+end note
+@enduml

@@ -1,0 +1,29 @@
+@startuml strategy
+class AdvisorAdapterRegistrationManager{
+    + advisorAdapterRegistry: AdvisorAdapterRegistry
+    + setAdvisorAdapterRegistry(AdvisorAdapterRegistry)
+    + postProcessAfterInitialization(AdvisorAdapter)
+}
+
+interface AdvisorAdapterRegistry{
+    + getInterceptors(Advisor): MethodInterceptor[]
+    + registerAdvisorAdapter(AdvisorAdapter)
+}
+
+class DefaultAdvisorAdapterRegistry{
+    + advisorAdapter: AdvisorAdapter[]
+    + getInterceptors(Advisor): MethodInterceptor[]
+    + registerAdvisorAdapter(AdvisorAdapter)
+}
+
+note right of AdvisorAdapterRegistrationManager
+Object postProcessAfterInitialization(AdvisorAdapter){
+    this.advisorAdapterRegistry.registerAdvisorAdapter(AdvisorAdapter)
+}
+
+end note
+
+AdvisorAdapterRegistrationManager --> AdvisorAdapterRegistry
+AdvisorAdapterRegistry <|.. DefaultAdvisorAdapterRegistry
+
+@enduml

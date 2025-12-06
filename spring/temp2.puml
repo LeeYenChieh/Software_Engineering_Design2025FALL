@@ -1,0 +1,43 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+package "Client Context (Registry)" {
+    class DefaultAdvisorAdapterRegistry {
+        + getInterceptors()
+    }
+}
+
+package "The Adapter Pattern Core" {
+    
+    interface "Target Interface\n(MethodInterceptor)" as Target {
+        + invoke()
+    }
+
+    class "Adapter\n(MethodBeforeAdviceInterceptor)" as Adapter {
+        + invoke()
+    }
+
+    interface "Adaptee\n(MethodBeforeAdvice)" as Adaptee {
+        + before()
+    }
+}
+
+' Relationships
+DefaultAdvisorAdapterRegistry .right.> Target : expects
+Adapter .up.|> Target : implements
+Adapter o-right-> Adaptee : wraps & delegates
+
+note top of Adapter
+  <b>這是真正的轉接器</b>
+  它把 invoke() 的呼叫
+  轉譯給 before()
+end note
+
+note left of DefaultAdvisorAdapterRegistry
+  <b>這是 Client</b>
+  它透過 Factory 拿到 Adapter，
+  但它只認得 Target 介面。
+end note
+
+@enduml

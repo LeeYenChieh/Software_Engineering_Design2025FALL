@@ -1,0 +1,45 @@
+@startuml factory
+skinparam linetype ortho
+
+together{
+    interface AdvisorAdapter{
+        + getInterceptor(Advisor): MethodInterceptor
+    }
+
+    class MethodBeforeAdviceAdapter{
+        + getInterceptor(Advisor): MethodBeforeAdviceInterceptor
+    }
+
+    class AfterReturningAdviceAdapter{
+        + getInterceptor(Advisor): AfterReturningAdviceInterceptor
+    }
+}
+
+
+together{
+    interface MethodInterceptor{
+
+    }
+
+    class MethodBeforeAdviceInterceptor{
+        + advice: MethodBeforeAdvice
+        + invoke(MethodInvocation)
+    }
+
+
+    class AfterReturningAdviceInterceptor{
+        + advice: AfterReturningAdvice
+        + invoke(MethodInvocation)
+    }
+}
+
+AdvisorAdapter <|.. AfterReturningAdviceAdapter
+AdvisorAdapter <|.. MethodBeforeAdviceAdapter
+
+MethodInterceptor <|.. MethodBeforeAdviceInterceptor
+MethodInterceptor <|.. AfterReturningAdviceInterceptor
+
+MethodBeforeAdviceAdapter ...> MethodBeforeAdviceInterceptor: <<create>>
+AfterReturningAdviceAdapter ..right.> AfterReturningAdviceInterceptor: <<create>>
+@enduml
+

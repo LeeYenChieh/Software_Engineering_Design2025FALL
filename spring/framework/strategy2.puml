@@ -1,0 +1,70 @@
+@startuml strategy2
+skinparam linetype ortho
+
+class ProxyCreatorSupport{
+    - listeners: AdvicedSupportListener[]
+    - aopProxyFactory: AopProxyFactory
+    + setAopProxyFactory(AopProxyFactory)
+    + createAopProxy(): AopProxy
+    + adviceChanged()
+    + activate()
+}
+
+note right of ProxyCreatorSupport
+void adviceChanged(){
+    for l in listeners
+        l.adviceChanged()
+}
+
+void activate(){
+    for l in listeners
+        l.activate()
+}
+
+AopProxy createAopProxy(){
+    return this.aopProxyFactory.createAopProxy()
+}
+end note
+
+class ProxyFactory{
+    + getProxy(): Object
+}
+
+class ProxyFactoryBean{
+    + getProxy(): Object
+}
+
+note bottom of ProxyFactory
+Object getProxy(){
+    return createAopProxy().getProxy();
+}
+end note
+
+note bottom of ProxyFactoryBean
+Object getProxy(AopProxy aopProxy) {
+    return aopProxy.getProxy();
+}
+end note
+
+ProxyCreatorSupport <|-- ProxyFactory
+ProxyCreatorSupport <|-- ProxyFactoryBean
+
+interface AopProxyFactory{
+    + createAopProx(): AopProxy
+}
+
+class DefaultAopProxyFactory{
+    + createAopProx(): AopProxy
+}
+
+note bottom of DefaultAopProxyFactory
+if(cond A)
+    create ObjenesisCglibAopProxy
+else if(cond B)
+    create JdkDynamicAopProxy
+end note
+
+ProxyCreatorSupport --> AopProxyFactory
+AopProxyFactory <|.. DefaultAopProxyFactory
+
+@enduml

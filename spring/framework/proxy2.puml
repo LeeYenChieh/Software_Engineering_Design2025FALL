@@ -1,0 +1,28 @@
+@startuml proxy2
+skinparam linetype ortho
+
+
+
+class UserService {
+    + method()
+}
+
+class Proxy {
+    + method()
+}
+
+class ReflectiveMethodInvocation {
+    + proceed()
+}
+
+UserService <|-- Proxy
+Proxy --> ReflectiveMethodInvocation
+ReflectiveMethodInvocation --> UserService
+
+note top of Proxy
+void method(){
+    ReflectiveMethodInvocation().proceed()
+}
+end note
+
+@enduml

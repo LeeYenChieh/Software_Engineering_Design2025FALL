@@ -1,0 +1,57 @@
+@startuml adapterPattern
+skinparam linetype ortho
+
+together{
+    interface MethodInterceptor{
+
+    }
+
+    class MethodBeforeAdviceInterceptor{
+        + advice: MethodBeforeAdvice
+        + invoke(MethodInvocation)
+    }
+
+
+    class AfterReturningAdviceInterceptor{
+        + advice: AfterReturningAdvice
+        + invoke(MethodInvocation)
+    }
+}
+
+note bottom of AfterReturningAdviceInterceptor
+Object invoke(MethodInvocation mi){
+    mi.proceed();
+    this.advice.afterReturing()
+}
+end note
+
+note bottom of MethodBeforeAdviceInterceptor
+Object invoke(MethodInvocation mi){
+    this.advice.before()
+    mi.proceed();
+}
+end note
+
+MethodInterceptor <|.. MethodBeforeAdviceInterceptor
+MethodInterceptor <|.. AfterReturningAdviceInterceptor
+
+together{
+    interface Advice{
+
+    }
+
+    interface AfterReturningAdvice{
+        + afterReturing()
+    }
+
+    interface MethodBeforeAdvice{
+        + before()
+    }
+
+    Advice <|.. AfterReturningAdvice
+    Advice <|.. MethodBeforeAdvice
+}
+MethodBeforeAdviceInterceptor --> MethodBeforeAdvice
+AfterReturningAdviceInterceptor --> AfterReturningAdvice
+
+@enduml

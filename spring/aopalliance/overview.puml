@@ -1,15 +1,17 @@
 @startuml overview
-interface Advise{
+skinparam linetype ortho
+
+interface Advice{
 
 }
 
 interface Interceptor{
 --
-卡在方法執行的中間
+卡在Invocation執行的中間
 決定要不要修改參數或者修改回傳值
 }
 
-Advise <|-- Interceptor
+Advice <|-- Interceptor
 
 interface Jointpoint{
     + proceed(): Object
@@ -27,7 +29,10 @@ interface Invocation{
 Jointpoint <|-- Invocation
 
 interface MethodInterceptor{
-
+    + invoke(MethodInvocation): Object
+    --
+    卡在MethodInvocation執行之間
+    決定在哪些部分執行使用者定義的aspect的advice
 }
 
 interface MethodInvocation{
@@ -39,7 +44,7 @@ Invocation <|-- MethodInvocation
 
 
 interface ConstructorInterceptor{
-
+    + construct(ConstructorInvocation): Object
 }
 
 interface ConstructorInvocation{
@@ -48,4 +53,7 @@ interface ConstructorInvocation{
 
 Interceptor <|-- ConstructorInterceptor
 Invocation <|-- ConstructorInvocation
+
+MethodInterceptor --> MethodInvocation
+ConstructorInterceptor --> ConstructorInvocation
 @enduml
