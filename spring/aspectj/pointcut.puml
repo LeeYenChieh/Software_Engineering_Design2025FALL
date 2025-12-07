@@ -1,0 +1,35 @@
+@startuml pointcut
+skinparam linetype ortho
+
+class AspectJExpressionPointcut {
+    - expression : String
+    + matches(Method, Class)
+}
+
+package aspectj{
+    class NamePattern
+    class ContextBasedMatcher
+    class FuzzyBoolean
+    class JoinPointMatch
+    class MatchingContext
+    class PointcutDesignatorHandler
+    class PointcutExpression
+    class PointcutParameter
+    class PointcutParser
+    class PointcutPrimitive
+    class ShadowMatch
+}
+AspectJExpressionPointcut --> NamePattern
+AspectJExpressionPointcut --> ContextBasedMatcher
+AspectJExpressionPointcut --> FuzzyBoolean
+AspectJExpressionPointcut --> JoinPointMatch
+AspectJExpressionPointcut --> MatchingContext
+AspectJExpressionPointcut --> PointcutDesignatorHandler
+AspectJExpressionPointcut --> PointcutExpression
+AspectJExpressionPointcut --> PointcutParameter
+AspectJExpressionPointcut --> PointcutParser
+AspectJExpressionPointcut --> PointcutPrimitive
+AspectJExpressionPointcut --> ShadowMatch
+
+
+@enduml

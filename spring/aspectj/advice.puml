@@ -1,0 +1,70 @@
+@startuml advice
+skinparam linetype ortho
+
+abstract class AbstractAspectJAdvice {
+    # aspectJAdviceMethod : Method
+    # pointcut : AspectJExpressionPointcut
+    # aspectInstanceFactory : AspectInstanceFactory
+    + invokeAdviceMethod()
+    --
+    adapter Pattern
+}
+
+class AspectJMethodBeforeAdvice {
+    + before()
+}
+
+class AspectJAfterReturningAdvice {
+    + afterReturning()
+}
+
+class AspectJAfterThrowingAdvice{
+
+}
+
+class AspectJAroundAdvice{
+
+}
+
+interface AspectInstanceFactory {
+    + getAspectInstance()
+    + getAspectClassLoader()
+    --
+    factory pattern
+}
+
+class SingletonAspectInstanceFactory{
+    + getAspectInstance()
+}
+
+class SimpleAspectInstanceFactory{
+    + aspectClass: Class<?>
+    + getAspectInstance()
+}
+
+class UserService{
+    + method()
+}
+
+AbstractAspectJAdvice o-- AspectInstanceFactory
+
+AspectInstanceFactory ..> UserService: <<create>>
+AbstractAspectJAdvice --> UserService
+
+note bottom of SimpleAspectInstanceFactory
+Object getAspectInstance(){
+    return ReflectionUtils.accessibleConstructor(this.aspectClass).newInstance();
+}
+end note
+
+
+
+AbstractAspectJAdvice <|-- AspectJMethodBeforeAdvice
+AbstractAspectJAdvice <|-- AspectJAfterReturningAdvice
+AbstractAspectJAdvice <|-- AspectJAfterThrowingAdvice
+AbstractAspectJAdvice <|-- AspectJAroundAdvice
+
+AspectInstanceFactory <|.. SingletonAspectInstanceFactory
+AspectInstanceFactory <|.. SimpleAspectInstanceFactory
+
+@enduml

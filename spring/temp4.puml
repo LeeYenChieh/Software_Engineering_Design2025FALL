@@ -1,114 +1,89 @@
 @startuml
-skinparam classAttributeIconSize 0
 skinparam linetype ortho
 skinparam nodesep 60
 skinparam ranksep 60
-skinparam noteBackgroundColor #FFFFAA
-skinparam noteBorderColor #DDAA00
+skinparam groupInheritance 2
 
-package "Spring AOP Core Interfaces (Target)" {
-    interface Pointcut
-    interface MethodMatcher
-    interface ClassFilter
-    
-    interface Advice
-    interface MethodInterceptor
-    interface MethodBeforeAdvice
-    interface AfterReturningAdvice
-}
-
-package "AspectJ Runtime (Adaptee)" {
-    interface "org.aspectj.lang.JoinPoint" as JoinPoint
-    interface "org.aspectj.lang.ProceedingJoinPoint" as ProceedingJoinPoint
-}
-
-package "org.springframework.aop.aspectj (The Bridge)" {
-
-    ' 1. Pointcut Integration
-    class AspectJExpressionPointcut {
-        - pointcutDeclaration : String
-        - pointcutParser : PointcutParser (from AspectJ Weaver)
-        + matches(Method, Class) : boolean
+' --- 1. Target Interface (Spring AOP Standard) ---
+package "Target Interface (Spring AOP)" #DDFFDD {
+    interface "MethodBeforeAdvice" as TargetBefore {
+        + before()
     }
+    interface "MethodInterceptor" as TargetAround {
+        + invoke()
+    }
+}
 
-    ' 2. Advice Adapters Base
+' --- 2. Adapter (The Bridge) ---
+package "Adapter Layer (org.springframework.aop.aspectj)" #E0E0FF {
     abstract class AbstractAspectJAdvice {
         # aspectJAdviceMethod : Method
-        # pointcut : AspectJExpressionPointcut
         # aspectInstanceFactory : AspectInstanceFactory
-        + invokeAdviceMethod(JoinPoint, returnValue, ex)
+        + invokeAdviceMethod()
+        ..
+        <color:Red>1. Uses Factory to get Instance</color>
+        <color:Red>2. Uses Reflection to invoke Method</color>
     }
 
-    ' 3. Concrete Advice Adapters
     class AspectJMethodBeforeAdvice {
-        + before(...)
+        + before()
     }
-
-    class AspectJAfterReturningAdvice {
-        + afterReturning(...)
-    }
-
-    class AspectJAfterThrowingAdvice {
-        + invoke(MethodInvocation)
-    }
-
+    
     class AspectJAroundAdvice {
-        + invoke(MethodInvocation)
+        + invoke()
     }
 
-    ' 4. Runtime Argument Binding
-    class MethodInvocationProceedingJoinPoint {
-        - methodInvocation : MethodInvocation
-        + proceed()
-        + getArgs()
+    class AspectJAfterReturningAdvice
+    class AspectJAfterThrowingAdvice
+    
+    interface AspectInstanceFactory {
+        + getAspectInstance() : Object
+        --
+        <color:Blue>Factory Pattern</color>
+    }
+
+    class SingletonAspectInstanceFactory
+    class SimpleAspectInstanceFactory
+}
+
+' --- 3. Adaptee (User Code / Weaver Object) ---
+package "Adaptee (User Defined / Weaver Object)" #FFEEEE {
+    class "UserLoggingAspect\n(@Aspect)" as UserAspect {
+        + logBefore()
+        + checkSecurityAround()
+        --
+        <color:DarkRed>Plain Java Object (POJO)</color>
+        <color:DarkRed>No Spring Interfaces implementation</color>
     }
 }
 
-' Pointcut Relationships
-AspectJExpressionPointcut .up.|> Pointcut : implements
-AspectJExpressionPointcut .up.|> MethodMatcher : implements
-AspectJExpressionPointcut .up.|> ClassFilter : implements
+' --- Relationships for Adapter Pattern ---
 
-' Advice Relationships
-AbstractAspectJAdvice .up.|> Advice : implements
-AbstractAspectJAdvice o-left- AspectJExpressionPointcut : associated with
+' Realization (Adapter implements Target)
+TargetBefore <|.. AspectJMethodBeforeAdvice
+TargetAround <|.. AspectJAroundAdvice
 
-AspectJMethodBeforeAdvice -up-|> AbstractAspectJAdvice
-AspectJMethodBeforeAdvice .up.|> MethodBeforeAdvice : implements (Adapter)
+' Inheritance
+AbstractAspectJAdvice <|-- AspectJMethodBeforeAdvice
+AbstractAspectJAdvice <|-- AspectJAroundAdvice
+AbstractAspectJAdvice <|-- AspectJAfterReturningAdvice
+AbstractAspectJAdvice <|-- AspectJAfterThrowingAdvice
 
-AspectJAfterReturningAdvice -up-|> AbstractAspectJAdvice
-AspectJAfterReturningAdvice .up.|> AfterReturningAdvice : implements (Adapter)
+' Factory Relationships
+AbstractAspectJAdvice o-right- AspectInstanceFactory
+AspectInstanceFactory <|.. SingletonAspectInstanceFactory
+AspectInstanceFactory <|.. SimpleAspectInstanceFactory
 
-AspectJAfterThrowingAdvice -up-|> AbstractAspectJAdvice
-AspectJAfterThrowingAdvice .up.|> MethodInterceptor : implements (Adapter)
+' The "Adaptation" Link (Crucial Part)
+SingletonAspectInstanceFactory .down.> UserAspect : returns instance >
+SimpleAspectInstanceFactory .down.> UserAspect : creates instance >
 
-AspectJAroundAdvice -up-|> AbstractAspectJAdvice
-AspectJAroundAdvice .up.|> MethodInterceptor : implements (Adapter)
+AbstractAspectJAdvice .down.> UserAspect : <color:Red><b>Reflectively Invokes (Adapts)</b></color>
 
-' JoinPoint Adapter Relationship
-MethodInvocationProceedingJoinPoint .up.|> ProceedingJoinPoint : implements
-MethodInvocationProceedingJoinPoint o-down-> "org.aopalliance.intercept.MethodInvocation" : wraps
-
-' Design Pattern Notes
-
-note right of AspectJExpressionPointcut
-  <b>Facade / Adapter Pattern</b>
-  表面上是 Spring 的 Pointcut，
-  實際上把 matches() 委派給
-  AspectJ 的 library 去運算。
-end note
-
-note right of AspectJMethodBeforeAdvice
-  <b>Adapter Pattern</b>
-  將 @Before 的方法 (Adaptee)
-  轉接成 MethodBeforeAdvice (Target)。
-end note
-
-note bottom of MethodInvocationProceedingJoinPoint
-  <b>Adapter Pattern</b>
-  把 Spring 的 MethodInvocation
-  偽裝成 AspectJ 的 ProceedingJoinPoint
-  傳給使用者的 Aspect 程式碼。
+note right of AbstractAspectJAdvice
+  **Adapter Logic:**
+  1. Calls factory.getAspectInstance() -> gets UserAspect
+  2. Calls method.invoke(instance) -> executes logBefore()
 end note
 
 @enduml

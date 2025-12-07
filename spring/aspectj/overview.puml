@@ -1,0 +1,107 @@
+@startuml overview
+skinparam linetype ortho
+
+abstract class AbstractAspectJAdvice {
+    # aspectJAdviceMethod : Method
+    # pointcut : AspectJExpressionPointcut
+    # aspectInstanceFactory : AspectInstanceFactory
+    + invokeAdviceMethod()
+    --
+    adapter Pattern
+}
+
+class AspectJMethodBeforeAdvice {
+    + before()
+}
+
+class AspectJAfterReturningAdvice {
+    + afterReturning()
+}
+
+class AspectJAfterThrowingAdvice{
+
+}
+
+class AspectJAroundAdvice{
+
+}
+
+class AspectJExpressionPointcut {
+    - expression : String
+    + matches(Method, Class)
+}
+
+class AspectJPointcutAdvisor {
+    - advice : AbstractAspectJAdvice
+    - pointcut : Pointcut
+}
+
+interface AspectInstanceFactory {
+    + getAspectInstance()
+    + getAspectClassLoader()
+    --
+    factory pattern
+}
+
+class SingletonAspectInstanceFactory{
+    + getAspectInstance()
+}
+
+class SimpleAspectInstanceFactory{
+    + aspectClass: Class<?>
+    + getAspectInstance()
+}
+
+class UserService{
+    + method()
+}
+
+AspectInstanceFactory ..> UserService: <<create>>
+AbstractAspectJAdvice --> UserService
+
+note bottom of SimpleAspectInstanceFactory
+Object getAspectInstance(){
+    return ReflectionUtils.accessibleConstructor(this.aspectClass).newInstance();
+}
+end note
+
+
+
+AbstractAspectJAdvice <|-- AspectJMethodBeforeAdvice
+AbstractAspectJAdvice <|-- AspectJAfterReturningAdvice
+AbstractAspectJAdvice <|-- AspectJAfterThrowingAdvice
+AbstractAspectJAdvice <|-- AspectJAroundAdvice
+
+AspectJPointcutAdvisor o-- AbstractAspectJAdvice
+AspectJPointcutAdvisor o-- AspectJExpressionPointcut
+AbstractAspectJAdvice o-- AspectInstanceFactory
+
+AspectInstanceFactory <|.. SingletonAspectInstanceFactory
+AspectInstanceFactory <|.. SimpleAspectInstanceFactory
+
+package weaver{
+    class NamePattern
+    class ContextBasedMatcher
+    class FuzzyBoolean
+    class JoinPointMatch
+    class MatchingContext
+    class PointcutDesignatorHandler
+    class PointcutExpression
+    class PointcutParameter
+    class PointcutParser
+    class PointcutPrimitive
+    class ShadowMatch
+}
+AspectJExpressionPointcut --> NamePattern
+AspectJExpressionPointcut --> ContextBasedMatcher
+AspectJExpressionPointcut --> FuzzyBoolean
+AspectJExpressionPointcut --> JoinPointMatch
+AspectJExpressionPointcut --> MatchingContext
+AspectJExpressionPointcut --> PointcutDesignatorHandler
+AspectJExpressionPointcut --> PointcutExpression
+AspectJExpressionPointcut --> PointcutParameter
+AspectJExpressionPointcut --> PointcutParser
+AspectJExpressionPointcut --> PointcutPrimitive
+AspectJExpressionPointcut --> ShadowMatch
+
+@enduml
