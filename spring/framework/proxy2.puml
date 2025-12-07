@@ -7,22 +7,24 @@ class UserService {
     + method()
 }
 
-class Proxy {
-    + method()
+package Proxy{
+    class Proxy {
+        + method()
+    }
+    note top of Proxy
+        void method(){
+            ReflectiveMethodInvocation().proceed()
+        }
+        end note
+
+    class ReflectiveMethodInvocation {
+        + proceed()
+    }
+    UserService <|-- Proxy
+    Proxy --> ReflectiveMethodInvocation
 }
 
-class ReflectiveMethodInvocation {
-    + proceed()
-}
 
-UserService <|-- Proxy
-Proxy --> ReflectiveMethodInvocation
 ReflectiveMethodInvocation --> UserService
-
-note top of Proxy
-void method(){
-    ReflectiveMethodInvocation().proceed()
-}
-end note
 
 @enduml

@@ -1,0 +1,43 @@
+@startuml autoproxy
+skinparam linetype ortho
+
+abstract class AbstractAutoProxyCreator {
+    + postProcessAfterInitialization(Bean)
+    # {abstract} getAdvicesAndAdvisorsForBean()
+    # createProxy()
+}
+
+class BeanNameAutoProxyCreator {
+    - beanNames: List<String>
+    # getAdvicesAndAdvisorsForBean()
+}
+
+abstract class AbstractAdvisorAutoProxyCreator {
+    # getAdvicesAndAdvisorsForBean()
+    # findCandidateAdvisors()
+}
+
+class DefaultAdvisorAutoProxyCreator {
+    # isEligibleAdvisorBean(String beanName): boolean
+}
+
+class InfrastructureAdvisorAutoProxyCreator {
+    # isEligibleAdvisorBean(String beanName): boolean
+}
+
+
+AbstractAutoProxyCreator <|-- BeanNameAutoProxyCreator
+AbstractAutoProxyCreator <|-- AbstractAdvisorAutoProxyCreator
+AbstractAdvisorAutoProxyCreator <|-- DefaultAdvisorAutoProxyCreator
+AbstractAdvisorAutoProxyCreator <|-- InfrastructureAdvisorAutoProxyCreator
+
+' Notes looking like yellow sticky notes (your team style)
+note right of AbstractAutoProxyCreator
+  void postProcessAfterInitialization(Bean bean){
+    **check if bean need proxy**
+    **advice = getAdvicesAndAdvisorsForBean(bean);**
+    **createProxy();**
+  }
+end note
+
+@enduml

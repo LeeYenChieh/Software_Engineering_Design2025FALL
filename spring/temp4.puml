@@ -1,43 +1,114 @@
-@startuml proxy_corrected
+@startuml
+skinparam classAttributeIconSize 0
 skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 60
+skinparam noteBackgroundColor #FFFFAA
+skinparam noteBorderColor #DDAA00
 
-class UserService {
-    + method()
+package "Spring AOP Core Interfaces (Target)" {
+    interface Pointcut
+    interface MethodMatcher
+    interface ClassFilter
+    
+    interface Advice
+    interface MethodInterceptor
+    interface MethodBeforeAdvice
+    interface AfterReturningAdvice
 }
 
-class "UserService$$EnhancerBySpringCGLIB" as Proxy {
-    - callback : MethodInterceptor
-    + method()
+package "AspectJ Runtime (Adaptee)" {
+    interface "org.aspectj.lang.JoinPoint" as JoinPoint
+    interface "org.aspectj.lang.ProceedingJoinPoint" as ProceedingJoinPoint
 }
 
-interface MethodInterceptor {
-    + intercept()
+package "org.springframework.aop.aspectj (The Bridge)" {
+
+    ' 1. Pointcut Integration
+    class AspectJExpressionPointcut {
+        - pointcutDeclaration : String
+        - pointcutParser : PointcutParser (from AspectJ Weaver)
+        + matches(Method, Class) : boolean
+    }
+
+    ' 2. Advice Adapters Base
+    abstract class AbstractAspectJAdvice {
+        # aspectJAdviceMethod : Method
+        # pointcut : AspectJExpressionPointcut
+        # aspectInstanceFactory : AspectInstanceFactory
+        + invokeAdviceMethod(JoinPoint, returnValue, ex)
+    }
+
+    ' 3. Concrete Advice Adapters
+    class AspectJMethodBeforeAdvice {
+        + before(...)
+    }
+
+    class AspectJAfterReturningAdvice {
+        + afterReturning(...)
+    }
+
+    class AspectJAfterThrowingAdvice {
+        + invoke(MethodInvocation)
+    }
+
+    class AspectJAroundAdvice {
+        + invoke(MethodInvocation)
+    }
+
+    ' 4. Runtime Argument Binding
+    class MethodInvocationProceedingJoinPoint {
+        - methodInvocation : MethodInvocation
+        + proceed()
+        + getArgs()
+    }
 }
 
-' Relationships
-Proxy -up-|> UserService : extends
+' Pointcut Relationships
+AspectJExpressionPointcut .up.|> Pointcut : implements
+AspectJExpressionPointcut .up.|> MethodMatcher : implements
+AspectJExpressionPointcut .up.|> ClassFilter : implements
 
-' The Delegation
-Proxy o-right-> MethodInterceptor : delegates to
+' Advice Relationships
+AbstractAspectJAdvice .up.|> Advice : implements
+AbstractAspectJAdvice o-left- AspectJExpressionPointcut : associated with
 
-note right of Proxy
-// 這是 CGLIB 的核心行為
-void method() {
-    // 1. 不直接呼叫 super
-    // 2. 而是轉發給攔截器 (Advice Chain 在這裡)
-    callback.intercept(this, method, args, methodProxy);
-}
+AspectJMethodBeforeAdvice -up-|> AbstractAspectJAdvice
+AspectJMethodBeforeAdvice .up.|> MethodBeforeAdvice : implements (Adapter)
+
+AspectJAfterReturningAdvice -up-|> AbstractAspectJAdvice
+AspectJAfterReturningAdvice .up.|> AfterReturningAdvice : implements (Adapter)
+
+AspectJAfterThrowingAdvice -up-|> AbstractAspectJAdvice
+AspectJAfterThrowingAdvice .up.|> MethodInterceptor : implements (Adapter)
+
+AspectJAroundAdvice -up-|> AbstractAspectJAdvice
+AspectJAroundAdvice .up.|> MethodInterceptor : implements (Adapter)
+
+' JoinPoint Adapter Relationship
+MethodInvocationProceedingJoinPoint .up.|> ProceedingJoinPoint : implements
+MethodInvocationProceedingJoinPoint o-down-> "org.aopalliance.intercept.MethodInvocation" : wraps
+
+' Design Pattern Notes
+
+note right of AspectJExpressionPointcut
+  <b>Facade / Adapter Pattern</b>
+  表面上是 Spring 的 Pointcut，
+  實際上把 matches() 委派給
+  AspectJ 的 library 去運算。
 end note
 
-note bottom of MethodInterceptor
-// 攔截器內部才會決定
-// 何時 (以及是否) 要呼叫 super
-void intercept(...) {
-   runBeforeAdvice();
-   // 透過 MethodProxy 呼叫父類別
-   proxy.invokeSuper(obj, args); 
-   runAfterAdvice();
-}
+note right of AspectJMethodBeforeAdvice
+  <b>Adapter Pattern</b>
+  將 @Before 的方法 (Adaptee)
+  轉接成 MethodBeforeAdvice (Target)。
+end note
+
+note bottom of MethodInvocationProceedingJoinPoint
+  <b>Adapter Pattern</b>
+  把 Spring 的 MethodInvocation
+  偽裝成 AspectJ 的 ProceedingJoinPoint
+  傳給使用者的 Aspect 程式碼。
 end note
 
 @enduml
