@@ -1,3 +1,5 @@
+package midterm;
+
 public class Book {
     public String author;
     public String subject;

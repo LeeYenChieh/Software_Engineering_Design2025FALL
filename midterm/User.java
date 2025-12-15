@@ -1,3 +1,5 @@
+package midterm;
+
 public class User {
     public String name;
 
