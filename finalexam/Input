@@ -1,0 +1,19 @@
+create Chasis1 10.1 9.2
+add bus Bus1 1.2 1.1 Chasis1
+add floppy Floppy1 1.3 1.2 Chasis1
+print Chasis1
+
+create Chasis2 10.1 9.2
+add bus Bus2 1.2 1.1 Chasis2
+add floppy Floppy2 1.3 1.2 Chasis2
+
+get Chasis2 2
+sumOfPowerConsumption Chasis1
+sumOfAdditionCost Chasis1
+sumOfPowerConsumption Chasis2
+sumOfAdditionCost Chasis2
+
+print Bus1
+print Bus2
+print Floppy1
+print Floppy2
